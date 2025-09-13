@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  api:
+    # Construit l'image avec TON Dockerfile
+    build:
+      context: .                 # Contexte = racine du projet
+      dockerfile: docker/Dockerfile
+    image: entity_match:latest   # Nom de l'image produite (optionnel mais pratique)
+    container_name: entity_api
+    ports:
+      - "5000:5000"              # host:container -> http://localhost:5000
+    environment:
+      # Variables utiles à ton app (complète si besoin)
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      MODEL_PATH: /app/models
+      DATA_PATH: /app/data
+      # Exemple Flask explicite (si tu utilises app.run(...))
+      FLASK_RUN_PORT: "5000"
+    volumes:
+      - ./models:/app/models     # persiste et te permet d'actualiser les modèles
+      - ./data:/app/data         # idem pour les données
+      - ./logs:/app/logs         # logs accessibles sur ta machine
+      # (optionnel) monter le code en dev pour hot-reload:
+      # - ./src:/app/src
+    command: ["python", "src/app.py"]  # override du CMD du Dockerfile si tu veux
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5000/health"]  # adapte à ton endpoint
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Job de prétraitement (one-shot)
+  preprocess:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: entity_match:latest
+    container_name: entity_preprocess
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    command: ["python", "src/data_preprocessing.py"]
+    restart: "no"
+
+  # Job d'entraînement (one-shot)
+  train:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: entity_match:latest
+    container_name: entity_train
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    command: ["python", "src/model_training.py"]
+    restart: "no"
