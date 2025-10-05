@@ -517,7 +517,7 @@ Consultez la [page des issues](https://github.com/mounirlamsayah/Entity_Resoluti
 
 ## 📚 Références
 
-- [Distributed Representations of Tuples for Entity Resolution]([https://www.cs.cmu.edu/~rsalakhu/papers/oneshot1.pdf](https://arxiv.org/pdf/1710.00597))
+- [Distributed Representations of Tuples for Entity Resolution](https://arxiv.org/pdf/1710.00597)
 - [Learning Text Similarity with Siamese Recurrent Networks](https://aclanthology.org/W16-1617.pdf)
 - [Knowledge Transfer for Entity Resolution with Siamese Neural Networks](https://ioanniskoumarelas.com/publication/snndedup/)
 
