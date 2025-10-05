@@ -333,13 +333,20 @@ Content-Type: application/json
 GET /health
 ```
 
-🔄 Pipeline MLOps
-Kubeflow Pipeline
-Le projet inclut un pipeline Kubeflow quasi-complet avec 5 composants implémentés.
+# 🔄 Pipeline MLOps
 
-Note : En raison de contraintes de ressources informatiques, je n'ai pas pu accéder à une interface Kubeflow déployée pour tester le pipeline en conditions réelles. Cependant, le code du pipeline est entièrement développé et il ne reste qu'une petite partie de finalisation pour le rendre 100% opérationnel en production. Le pipeline peut être compilé et est prêt pour être déployé sur un cluster Kubeflow fonctionnel.
+## 🚀 Kubeflow Pipeline
 
-mermaidgraph LR
+Le projet inclut un pipeline **Kubeflow** quasi-complet avec **5 composants implémentés**.
+
+> 📝 **Note :** En raison de contraintes de ressources informatiques, je n'ai pas pu accéder à une interface Kubeflow déployée pour tester le pipeline en conditions réelles.  
+> Cependant, **le code du pipeline est entièrement développé** et il ne reste qu'une petite partie de finalisation pour le rendre **100% opérationnel** en production.  
+> Le pipeline peut être compilé et est prêt pour être déployé sur un cluster Kubeflow fonctionnel.
+
+---
+
+```mermaid
+graph LR
     A[1. Data<br/>Preprocessing] --> B[2. Model<br/>Training]
     B --> C[3. Model<br/>Evaluation]
     C --> D[4. Model<br/>Validation]
@@ -350,42 +357,67 @@ mermaidgraph LR
     style C fill:#e8f5e9
     style D fill:#fce4ec
     style E fill:#f3e5f5
-État du pipeline
-ComposantStatutDescriptionData Preprocessing✅ ImplémentéChargement et traitement des donnéesModel Training✅ ImplémentéEntraînement du réseau siamoisModel Evaluation✅ ImplémentéÉvaluation sur jeu de testModel Validation✅ ImplémentéValidation selon seuils définisModel Deployment🔄 En coursDéploiement conditionnel du modèle
-Compiler le pipeline
-bash# Compiler le pipeline en fichier YAML
+
+## 📦 État du pipeline
+
+| Composant          | Statut       | Description                          |
+| ------------------ | ------------ | ------------------------------------ |
+| Data Preprocessing | ✅ Implémenté | Chargement et traitement des données |
+| Model Training     | ✅ Implémenté | Entraînement du réseau siamois       |
+| Model Evaluation   | ✅ Implémenté | Évaluation sur jeu de test           |
+| Model Validation   | ✅ Implémenté | Validation selon seuils définis      |
+| Model Deployment   | 🔄 En cours  | Déploiement conditionnel du modèle   |
+
+## ⚙️ Compiler le pipeline
+
+# Compiler le pipeline en fichier YAML
 python kubeflow/pipeline.py
 
 # Génère deux fichiers :
 # - entity_matching_pipeline.yaml (pipeline principal)
 # - entity_matching_retrain_pipeline.yaml (pipeline de retraining)
-Exécution du pipeline (quand Kubeflow disponible)
-bash# Option 1 : Via l'interface Kubeflow UI
-# 1. Se connecter à l'interface Kubeflow
-# 2. Uploader le fichier entity_matching_pipeline.yaml
-# 3. Créer une expérience "entity-matching"
-# 4. Lancer un run avec les paramètres souhaités
 
-# Option 2 : Via CLI
-kfp run submit \
-  --experiment-name entity-matching \
-  --pipeline-file entity_matching_pipeline.yaml \
-  --run-name entity-matching-run-1
-Paramètres du pipeline
-ParamètreDescriptionDéfautepochsNombre d'époques10batch_sizeTaille du batch32learning_rateTaux d'apprentissage0.001min_accuracySeuil de validation (accuracy)0.7min_f1Seuil de validation (F1-score)0.7model_nameNom du modèleentity-matcher-modelmodel_versionVersion du modèlev1
-Pipeline de Retraining
+##▶️ Exécution du pipeline (quand Kubeflow disponible)
+
+### Via l’interface Kubeflow UI
+
+1. Se connecter à l'interface Kubeflow
+2. Uploader le fichier entity_matching_pipeline.yaml
+3. Créer une expérience "entity-matching"
+4. Lancer un run avec les paramètres souhaités
+
+## 🔧 Paramètres du pipeline
+
+| Paramètre     | Description                    | Défaut               |
+| ------------- | ------------------------------ | -------------------- |
+| epochs        | Nombre d'époques               | 10                   |
+| batch_size    | Taille du batch                | 32                   |
+| learning_rate | Taux d'apprentissage           | 0.001                |
+| min_accuracy  | Seuil de validation (accuracy) | 0.7                  |
+| min_f1        | Seuil de validation (F1-score) | 0.7                  |
+| model_name    | Nom du modèle                  | entity-matcher-model |
+| model_version | Version du modèle              | v1                   |
+
+## 🔁 Pipeline de Retraining
+
 Un second pipeline est disponible pour le fine-tuning avec de nouvelles données :
-bash# Compiler le pipeline de retraining
+
+# Compiler le pipeline de retraining
 python kubeflow/pipeline.py
 
-# Le pipeline de retraining utilise :
-# - Learning rate plus faible (0.0001)
-# - Moins d'époques (5)
-# - Seuils de validation plus élevés (0.75)
+Ce pipeline utilise :
 
-🐳 Docker & Déploiement
+  - Un learning rate plus faible (0.0001)
+
+  - Moins d'époques (5)
+
+  - Seuils de validation plus élevés (0.75)
+
+## 🐳 Docker & Déploiement
+
 Docker Compose
-bash# Lancer l'API
+
+# Lancer l'API
 docker-compose -f docker/docker-compose.yaml up api
 
 # Exécuter le preprocessing
@@ -393,29 +425,31 @@ docker-compose -f docker/docker-compose.yaml up preprocess
 
 # Exécuter l'entraînement
 docker-compose -f docker/docker-compose.yaml up train
-Variables d'environnement
-bashMODEL_PATH=/app/models
+
+
+## 🌍 Variables d'environnement
+
+MODEL_PATH=/app/models
 DATA_PATH=/app/data
 FLASK_RUN_PORT=5000
 PYTHONUNBUFFERED=1
-Volumes persistants
 
-./models:/app/models : modèles entraînés
-./data:/app/data : données source
-./logs:/app/logs : logs d'exécution
+## 💾 Volumes persistants
 
+-   ./models:/app/models → modèles entraînés
 
-📊 Résultats
-Métriques du modèle
-MétriqueScoreAccuracy~85-90%Precision~87-92%Recall~83-88%F1-Score~85-90%
-Courbes d'apprentissage
-Les courbes sont automatiquement générées dans models/training_history.png après l'entraînement.
-Cas d'usage réels
+-   ./data:/app/data → données source
 
-✅ Déduplication de 100K+ enregistrements clients
-✅ Réduction de 95% des doublons
-✅ Temps de traitement : ~50ms par paire
-✅ Déploiement en production avec 99.9% uptime
+-   ./logs:/app/logs → logs d'exécution
+
+## 📊 Résultats
+
+| Métrique  | Score   |
+| --------- | ------- |
+| Accuracy  | ~85–90% |
+| Precision | ~87–92% |
+| Recall    | ~83–88% |
+| F1-Score  | ~85–90% |
 
 
 ## 🛠️ Technologies utilisées
