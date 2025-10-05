@@ -28,10 +28,8 @@
 - [Pipeline MLOps](#-pipeline-mlops)
 - [Docker & Déploiement](#-docker--déploiement)
 - [Résultats](#-résultats)
-- [Structure du projet](#-structure-du-projet)
 - [Technologies utilisées](#-technologies-utilisées)
 - [Contribuer](#-contribuer)
-- [Licence](#-licence)
 
 ---
 
