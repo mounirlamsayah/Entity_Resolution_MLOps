@@ -29,7 +29,6 @@
 - [Docker & Déploiement](#-docker--déploiement)
 - [Résultats](#-résultats)
 - [Technologies utilisées](#-technologies-utilisées)
-- [Contribuer](#-contribuer)
 
 ---
 
@@ -486,25 +485,6 @@ PYTHONUNBUFFERED=1
 
 ### Visualisation
 - **Matplotlib & Seaborn** - Graphiques
-
----
-
-## 🤝 Contribuer
-
-Les contributions sont les bienvenues ! Voici comment participer :
-
-1. **Fork** le projet
-2. **Créer** une branche feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** vos changements (`git commit -m 'Add AmazingFeature'`)
-4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
-5. **Ouvrir** une Pull Request
-
-### Guidelines
-
-- Suivre le style de code existant
-- Ajouter des tests pour les nouvelles fonctionnalités
-- Mettre à jour la documentation
-- S'assurer que tous les tests passent
 
 ---
 
