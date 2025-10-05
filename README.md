@@ -333,8 +333,6 @@ Content-Type: application/json
 GET /health
 ```
 
----
-
 🔄 Pipeline MLOps
 Kubeflow Pipeline
 Le projet inclut un pipeline Kubeflow quasi-complet avec 5 composants implémentés.
