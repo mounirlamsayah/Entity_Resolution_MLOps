@@ -7,7 +7,6 @@
 ![Flask](https://img.shields.io/badge/Flask-2.3.2-green.svg)
 ![Kubeflow](https://img.shields.io/badge/Kubeflow-2.0.1-purple.svg)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Système intelligent de résolution d'entités utilisant un réseau de neurones siamois avec pipeline MLOps complet**
 
