@@ -7,7 +7,6 @@
 ![Flask](https://img.shields.io/badge/Flask-2.3.2-green.svg)
 ![Kubeflow](https://img.shields.io/badge/Kubeflow-2.0.1-purple.svg)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Système intelligent de résolution d'entités utilisant un réseau de neurones siamois avec pipeline MLOps complet**
 
@@ -29,10 +28,8 @@
 - [Pipeline MLOps](#-pipeline-mlops)
 - [Docker & Déploiement](#-docker--déploiement)
 - [Résultats](#-résultats)
-- [Structure du projet](#-structure-du-projet)
 - [Technologies utilisées](#-technologies-utilisées)
 - [Contribuer](#-contribuer)
-- [Licence](#-licence)
 
 ---
 
@@ -72,8 +69,6 @@ Ce projet implémente une solution MLOps complète pour la **résolution d'entit
 
 - **Pipeline Kubeflow** complet pour l'entraînement et le déploiement
 - **Containerisation Docker** pour portabilité
-- **CI/CD Ready** avec validation automatique du modèle
-- **Monitoring et logging** intégrés
 
 ---
 
@@ -345,7 +340,9 @@ GET /health
 
 ### Kubeflow Pipeline
 
-Le projet inclut un pipeline Kubeflow complet avec 5 composants :
+Le projet inclut un pipeline Kubeflow quasi-complet avec 5 composants implémentés. 
+
+> **Note** : En raison de contraintes de ressources informatiques, je n'ai pas pu accéder à une interface Kubeflow déployée pour tester le pipeline en conditions réelles. Cependant, **le code du pipeline est entièrement développé** et il ne reste qu'une petite partie de finalisation pour le rendre 100% opérationnel en production. Le pipeline peut être compilé et est prêt pour être déployé sur un cluster Kubeflow fonctionnel.
 
 ```mermaid
 graph LR
@@ -361,17 +358,36 @@ graph LR
     style E fill:#f3e5f5
 ```
 
-### Compiler et exécuter le pipeline
+### État du pipeline
+
+| Composant | Statut | Description |
+|-----------|--------|-------------|
+| Data Preprocessing | ✅ Implémenté | Chargement et traitement des données |
+| Model Training | ✅ Implémenté | Entraînement du réseau siamois |
+| Model Evaluation | ✅ Implémenté | Évaluation sur jeu de test |
+| Model Validation | ✅ Implémenté | Validation selon seuils définis |
+| Model Deployment | 🔄 En cours | Déploiement conditionnel du modèle |
+
+### Compiler le pipeline
 
 ```bash
-# Compiler le pipeline
+# Compiler le pipeline en fichier YAML
 python kubeflow/pipeline.py
 
-# Soumettre à Kubeflow (via UI ou CLI)
-kfp run submit \
-  --experiment-name entity-matching \
-  --pipeline-file entity_matching_pipeline.yaml \
-  --run-name entity-matching-run-1
+# Génère deux fichiers :
+# - entity_matching_pipeline.yaml (pipeline principal)
+# - entity_matching_retrain_pipeline.yaml (pipeline de retraining)
+```
+
+### Exécution du pipeline (quand Kubeflow disponible)
+
+```bash
+# Via l'interface Kubeflow UI
+# 1. Se connecter à l'interface Kubeflow
+# 2. Uploader le fichier entity_matching_pipeline.yaml
+# 3. Créer une expérience "entity-matching"
+# 4. Lancer un run avec les paramètres souhaités
+
 ```
 
 ### Paramètres du pipeline
@@ -383,6 +399,22 @@ kfp run submit \
 | `learning_rate` | Taux d'apprentissage | 0.001 |
 | `min_accuracy` | Seuil de validation (accuracy) | 0.7 |
 | `min_f1` | Seuil de validation (F1-score) | 0.7 |
+| `model_name` | Nom du modèle | entity-matcher-model |
+| `model_version` | Version du modèle | v1 |
+
+### Pipeline de Retraining
+
+Un second pipeline est disponible pour le fine-tuning avec de nouvelles données :
+
+```bash
+# Compiler le pipeline de retraining
+python kubeflow/pipeline.py
+
+# Le pipeline de retraining utilise :
+# - Learning rate plus faible (0.0001)
+# - Moins d'époques (5)
+# - Seuils de validation plus élevés (0.75)
+```
 
 ---
 
@@ -428,57 +460,6 @@ PYTHONUNBUFFERED=1
 | **Precision** | ~87-92% |
 | **Recall** | ~83-88% |
 | **F1-Score** | ~85-90% |
-
-### Courbes d'apprentissage
-
-Les courbes sont automatiquement générées dans `models/training_history.png` après l'entraînement.
-
-### Cas d'usage réels
-
-- ✅ Déduplication de 100K+ enregistrements clients
-- ✅ Réduction de 95% des doublons
-- ✅ Temps de traitement : ~50ms par paire
-- ✅ Déploiement en production avec 99.9% uptime
-
----
-
-## 📁 Structure du projet
-
-```
-Entity_Resolution_MLOps/
-├── 📂 data/                          # Données brutes
-│   ├── source_final.csv
-│   └── reference_final.csv
-│
-├── 📂 src/                           # Code source
-│   ├── app.py                        # Application Flask
-│   ├── data_preprocessing.py         # Preprocessing des données
-│   ├── model_training.py             # Entraînement du modèle
-│   └── utils.py                      # Utilitaires
-│
-├── 📂 models/                        # Modèles et artefacts
-│   ├── siamese_entity_matcher.h5     # Modèle entraîné
-│   ├── tokenizer.pkl                 # Tokenizer
-│   ├── *.npy                         # Données preprocessées
-│   └── training_*.json/png           # Métriques et visualisations
-│
-├── 📂 docker/                        # Configuration Docker
-│   ├── Dockerfile
-│   └── docker-compose.yaml
-│
-├── 📂 kubeflow/                      # Pipeline Kubeflow
-│   └── pipeline.py
-│
-├── 📂 templates/                     # Templates web
-│   └── index.html
-│
-├── 📂 logs/                          # Logs d'exécution
-├── 📂 outputs/                       # Outputs et rapports
-│
-├── requirements.txt                  # Dépendances Python
-├── .gitignore                        # Fichiers ignorés
-└── README.md                         # Ce fichier
-```
 
 ---
 
@@ -544,12 +525,6 @@ Consultez la [page des issues](https://github.com/mounirlamsayah/Entity_Resoluti
 
 ---
 
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
----
-
 ## 👤 Auteur
 
 **Mounir Lamsayah**
@@ -557,14 +532,6 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 - Email: mounirlamssiyah@gmail.com
 - GitHub: [@mounirlamsayah](https://github.com/mounirlamsayah)
 - LinkedIn: [Mounir Lamsayah](https://linkedin.com/in/mounir-lamsayah)
-
----
-
-## 🙏 Remerciements
-
-- TensorFlow team pour le framework excellent
-- Kubeflow community pour les outils MLOps
-- Tous les contributeurs open-source
 
 ---
 
